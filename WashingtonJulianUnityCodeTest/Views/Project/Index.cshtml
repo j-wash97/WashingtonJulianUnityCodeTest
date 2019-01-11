@@ -1,0 +1,73 @@
+﻿@model WashingtonJulianUnityCodeTest.Models.Project
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Model.ProjInfo.Title - Made with Unity</title>
+</head>
+<body>
+    <div class="article" id="@Model.ProjInfo.ID">
+        @*Render project info*@
+        <h1>@Model.ProjInfo.Title</h1> 
+        <h2>By @Model.ProjInfo.Developer</h2>
+
+        @*Shortcuts to each section in the article*@
+        <div class="jumpto" style="display:inline">
+            @foreach (WashingtonJulianUnityCodeTest.Models.Article sec in Model.Sections)
+            {<a href="#@sec.SecTitle">@String.Join(" ", sec.SecTitle.Split('_')).ToUpper()</a> }
+        </div>
+
+        @*Render each section of the article*@
+        @foreach (WashingtonJulianUnityCodeTest.Models.Article sec in Model.Sections)
+        {
+            @*Hook up shortcut and assign background image*@
+            <div class="section" id="@sec.SecTitle" style="background-image: url('https://unity.com/sites/default/files/styles/16_9_xl/public/2018-03/@sec.BackgroundImgPath?itok=@sec.BckgrndImgToken'); height: 75vh">
+                @{ 
+                    //determine each piece of content that belongs in the section
+                    WashingtonJulianUnityCodeTest.Models.Content[] contents = Model.Contents.Where(x => x.SecID == sec.ID).OrderBy(x => x.ID).ToArray();
+                    //Render each piece of content depending on its type
+                    foreach (WashingtonJulianUnityCodeTest.Models.Content content in contents)
+                    {
+                        switch(content.Type)
+                        {
+                            case WashingtonJulianUnityCodeTest.Models.ContentType.Text:
+                                <div class="text" id="@content.ID">
+                                    <h3>@content.Sub</h3>
+                                    <p>@Html.Raw(content.Main)</p>
+                                </div>
+                                break;
+
+                            case WashingtonJulianUnityCodeTest.Models.ContentType.Image:
+                                <div class="image" id="@content.ID">
+                                    <img src="https://unity.com/sites/default/files/styles/16_9_xl/public/2018-03/@content.Main?itok=@content.ImgToken" title="@content.Sub" alt="@content.Main" />
+                                    <blockquote>@content.Sub</blockquote>
+                                </div>
+                                break;
+
+                            case WashingtonJulianUnityCodeTest.Models.ContentType.Video:
+                                <div class="video" id="@content.ID">
+                                    <iframe src="https://www.youtube.com/embed/@content.Main" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:75vh"></iframe>
+                                    <blockquote>@content.Sub</blockquote>
+                                </div>
+                                break;
+
+                            case WashingtonJulianUnityCodeTest.Models.ContentType.Link:
+                                <div class="link" id="@content.ID">
+                                    <h4>@content.Sub</h4>
+                                    <a href="@content.Main" style="display:inline"><button>Go</button></a>
+                                </div>
+                                break;
+                        }
+                    }
+                }
+            </div>
+        }
+    </div>
+</body>
+</html>
